@@ -46,7 +46,7 @@ Gmail Trigger → AI (OpenRouter) → Data Processing → Google Sheets → What
 
 ## 📸 Screenshots
 
-(Add your workflow screenshot here)
+![Workflow](Screenshot%202026-04-24%20003618.png)
 
 ---
 
