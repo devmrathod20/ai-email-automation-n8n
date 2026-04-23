@@ -1,0 +1,294 @@
+{
+  "name": "AI Email",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "event": "=messageReceived",
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d8e066db-1bff-4aa9-9079-9013a25ffecb",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "X8MbEaC7U1pne4aB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "HTTP-Referer",
+              "value": "http://localhost:5678"
+            },
+            {
+              "name": "X-Title",
+              "value": "Gmail AI Automation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"openai/gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You summarize emails for automation. Return only valid JSON.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Summarize the following email in 2 lines and extract key info.\\n\\nReturn JSON only in this format:\\n{\\n  \\\"subject\\\": \\\"\\\",\\n  \\\"summary\\\": \\\"\\\",\\n  \\\"priority\\\": \\\"high | medium | low\\\",\\n  \\\"action_needed\\\": true,\\n  \\\"action_item\\\": \\\"\\\"\\n}\\n\\nEmail:\\nSubject: {{$json.subject}}\\nFrom: {{$json.from}}\\nBody: {{$json.textPlain || $json.snippet}}\"\n    }\n  ],\n  \"temperature\": 0.2\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b345333f-421a-4976-9ceb-aa6ae89cd193",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = $json.choices[0].message.content;\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(content);\n} catch (e) {\n  parsed = {\n    summary: content,\n    priority: \"low\",\n    action_needed: false,\n    action_item: \"\"\n  };\n}\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "3967d9a3-ce65-4163-a1b3-7610e3a091da",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1dDfp-sTVtt3DiC2JBpuzeuLwf-cBW4UqzxEjd0M7m-k",
+          "mode": "list",
+          "cachedResultName": "AI Email Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dDfp-sTVtt3DiC2JBpuzeuLwf-cBW4UqzxEjd0M7m-k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dDfp-sTVtt3DiC2JBpuzeuLwf-cBW4UqzxEjd0M7m-k/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Subject": "={{ $json.subject }}",
+            "Summary": "={{ $json.summary }}",
+            "Priority": "={{ $json.priority }}",
+            "Action Needed": "={{ $json.action_needed }}",
+            "Action Item": "={{ $json.action_item }}",
+            "Timestamp": "={{$now}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Action Needed",
+              "displayName": "Action Needed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Action Item",
+              "displayName": "Action Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        0
+      ],
+      "id": "5d7b6cd7-1d1b-4239-a213-2d2658d1fa59",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9rn9Nl4Dj7pOaocX",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC87f6487a0b46283a0f10abbc81fa0392/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "whatsapp:+919313173033"
+            },
+            {
+              "name": "From",
+              "value": "whatsapp:+14155238886"
+            },
+            {
+              "name": "Body",
+              "value": "=🚨 New Email Alert\n\n📌 Subject: {{$node[\"Code in JavaScript\"].json[\"subject\"]}}\n📝 Summary: {{$node[\"Code in JavaScript\"].json[\"summary\"]}}\n⚡ Priority: {{$node[\"Code in JavaScript\"].json[\"priority\"]}}\n✅ Action Needed: {{$node[\"Code in JavaScript\"].json[\"action_needed\"]}}\n🎯 Action: {{$node[\"Code in JavaScript\"].json[\"action_item\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        780,
+        0
+      ],
+      "id": "1a2f67c9-ff51-4eae-b25f-c0ee2fa21a23",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "XLle9YuCVuhFU5lG",
+          "name": "Unnamed credential"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b2f9e811-33fb-4050-8a84-bf81d092795e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb0a35aa7f7cba76319fa96f70d7d2ac238782dda19f0e594cede47b091abab2"
+  },
+  "id": "QQy7nmv4IaIRQmk7",
+  "tags": []
+}
