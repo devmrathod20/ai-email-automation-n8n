@@ -1,5 +1,15 @@
 # 🚀 AI Email Automation using n8n
 
+![n8n](https://img.shields.io/badge/n8n-Workflow_Automation-orange)
+![AI](https://img.shields.io/badge/AI-OpenRouter-blue)
+![Gmail](https://img.shields.io/badge/Gmail-API-red)
+![Google Sheets](https://img.shields.io/badge/Google_Sheets-Integration-green)
+![Twilio](https://img.shields.io/badge/Twilio-WhatsApp-red)
+![Status](https://img.shields.io/badge/Status-Working-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+# 🚀 AI Email Automation using n8n
+
 ---
 
 ## 📌 Overview
